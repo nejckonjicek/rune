@@ -1,0 +1,56 @@
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Bun / JavaScript
+node_modules/
+bun.lockb
+*.tsbuildinfo
+
+# Vite / Svelte
+dist/
+.vite/
+.svelte-kit/
+coverage/
+
+# Rust / Cargo / Tauri
+target/
+*.rs.bk
+apps/desktop/tauri/gen/
+apps/desktop/src-tauri/gen/
+
+# Generated Roblox dependencies
+**/Packages/
+
+# Local Roblox tooling caches
+.foreman/
+.forest/
+
+# Rune local state and caches
+.rune/cache/
+.rune/state/
+.rune/logs/
+
+# Test and runtime output
+test-results/
+playwright-report/
+*.log
+*.tmp
+
+# Generated artifacts
+artifacts/
+
+# Memory
+memory/
