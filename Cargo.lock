@@ -2442,6 +2442,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "rune-core"
+version = "0.0.1"
+
+[[package]]
 name = "rune-desktop"
 version = "0.1.0"
 dependencies = [
