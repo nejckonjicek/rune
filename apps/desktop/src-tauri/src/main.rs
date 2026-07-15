@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-  rune_desktop_lib::run();
+    rune_desktop_lib::run();
 }

@@ -3,4 +3,5 @@ resolver = "2"
 members = [
     "apps/desktop/src-tauri",
     "crates/rune-core",
+    "crates/rune-project",
 ]
