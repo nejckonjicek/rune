@@ -47,11 +47,7 @@ impl InstanceSnapshot {
             id: node.id().value(),
             name: node.name().to_owned(),
             class_name: node.class_name().to_owned(),
-            children: node
-                .children()
-                .iter()
-                .map(Self::from_node)
-                .collect(),
+            children: node.children().iter().map(Self::from_node).collect(),
         }
     }
 }

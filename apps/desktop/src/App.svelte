@@ -1,89 +1,99 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+    import { open } from "@tauri-apps/plugin-dialog"
+    import ProjectTree from "./features/project-tree/ProjectTree.svelte"
+    import {
+      getProjectErrorMessage,
+      openProject,
+    } from "./lib/project/projectApi"
+    import type {
+      InstanceSnapshot,
+      ProjectSnapshot,
+    } from "./lib/project/projectTypes"
+
+    let project: ProjectSnapshot | null = null
+    let selectedNode: InstanceSnapshot | null = null
+    let errorMessage: string | null = null
+    let isLoading = false
+
+    async function chooseProject() {
+      errorMessage = null
+      isLoading = true
+
+      try {
+        const selection = await open({
+          multiple: false,
+          directory: false,
+          filters: [
+            {
+              name: "Rojo project",
+              extensions: ["json"],
+            },
+          ],
+        })
+
+        if (!selection || Array.isArray(selection)) {
+          return
+        }
+
+        if (!selection.toLowerCase().endsWith(".project.json")) {
+          errorMessage = "Select a Rojo .project.json file."
+          return
+        }
+
+        project = await openProject(selection)
+        selectedNode = null
+      } catch (error) {
+        errorMessage = getProjectErrorMessage(error)
+      } finally {
+        isLoading = false
+      }
+    }
+
+    function handleNodeSelect(node: InstanceSnapshot) {
+      selectedNode = node
+    }
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<svelte:head>
+    <title>Rune</title>
+</svelte:head>
 
-<div class="ticks"></div>
+<main class="app-shell">
+    <header class="toolbar">
+        <h1>Rune</h1>
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+        <button type="button" onclick={chooseProject} disabled={isLoading}>
+            {isLoading ? "Loading..." : "Open project"}
+        </button>
+    </header>
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+    {#if errorMessage}
+        <p class="error-message" role="alert">{errorMessage}</p>
+    {/if}
+
+    {#if project}
+        <div class="workspace">
+            <aside class="project-panel">
+                <h2>{project.name}</h2>
+
+                <ProjectTree
+                    root={project.root}
+                    onSelect={handleNodeSelect}
+                />
+            </aside>
+
+            <section class="selection-panel">
+                {#if selectedNode}
+                    <h2>{selectedNode.name}</h2>
+                    <p>{selectedNode.className}</p>
+                {:else}
+                    <p>Select a project node.</p>
+                {/if}
+            </section>
+        </div>
+    {:else if !isLoading}
+        <section class="empty-state">
+            <p>Open a Rojo project to inspect its DataModel.</p>
+        </section>
+    {/if}
+</main>
