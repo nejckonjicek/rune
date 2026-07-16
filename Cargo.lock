@@ -2450,6 +2450,7 @@ name = "rune-desktop"
 version = "0.1.0"
 dependencies = [
  "log",
+ "rune-project",
  "serde",
  "serde_json",
  "tauri",
